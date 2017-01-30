@@ -43,7 +43,7 @@ module GeoCLI::StatusCommand
   def uncodified_geo_ids(uncodified)
     uncodified
       .select { |r| !r.attributes.empty? }
-      .map { |r| r.attributes['_geo_id'] }
+      .map { |r| r.attributes['_geo_id'] || r.attributes['_terraform_id'] }
   end
 
   def status_types(options)
@@ -73,7 +73,7 @@ module GeoCLI::StatusCommand
       totals[:codified] += stats[:codified]
       totals[:uncodified] += stats[:uncodified]
       totals[:total] += stats[:total]
-      next if stats[:uncodified_resources].empty? || !@uncodified
+      next if stats[:uncodified_resources].empty? 
       totals[:uncodified_resources][type] = stats[:uncodified_resources]
     end
     totals[:percent] = (100.0 * totals[:codified]) / totals[:total]
