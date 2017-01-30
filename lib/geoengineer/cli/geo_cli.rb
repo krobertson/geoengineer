@@ -174,6 +174,12 @@ class GeoCLI
       @verbose = false
     }
 
+    @uncodified = false
+    global_option('--uncodified', 'reduce the noisy outputs (default they are on)') {
+      @uncodified = true
+      @verbose = false
+    }
+
     @no_color = ''
     global_option('--no-color', 'removes color from the terraform output') {
       String.disable_colorization = true

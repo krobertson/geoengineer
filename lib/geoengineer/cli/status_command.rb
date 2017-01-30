@@ -6,7 +6,8 @@ module GeoCLI::StatusCommand
       codified: codified.count,
       uncodified: uncodified.count,
       total: total,
-      percent: (100.0 * codified.count) / total
+      percent: (100.0 * codified.count) / total,
+      uncodified_resources: uncodified_geo_ids(uncodified)
     }
   end
 
@@ -39,6 +40,12 @@ module GeoCLI::StatusCommand
     puts Terminal::Table.new({ rows: rows })
   end
 
+  def uncodified_geo_ids(uncodified)
+    uncodified
+      .select { |r| !r.attributes.empty? }
+      .map { |r| r.attributes['_geo_id'] }
+  end
+
   def status_types(options)
     return options.resources.split(',') if options.resources
     environment.status_types ? environment.status_types : default_status_types
@@ -59,12 +66,15 @@ module GeoCLI::StatusCommand
     totals = {
       codified: 0,
       uncodified: 0,
-      total: 0
+      total: 0,
+      uncodified_resources: {}
     }
     type_stats.each do |type, stats|
       totals[:codified] += stats[:codified]
       totals[:uncodified] += stats[:uncodified]
       totals[:total] += stats[:total]
+      next if stats[:uncodified_resources].empty? || !@uncodified
+      totals[:uncodified_resources][type] = stats[:uncodified_resources]
     end
     totals[:percent] = (100.0 * totals[:codified]) / totals[:total]
     totals
